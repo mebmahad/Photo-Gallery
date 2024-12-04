@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import service from "../appwrite/config";
 import "./Portfolio.css";
 
 const Portfolio = () => {
@@ -8,16 +9,21 @@ const Portfolio = () => {
 
   useEffect(() => {
     const loadImages = async () => {
-      const images = await fetchImages("[YOUR_BUCKET_ID]");
-      setImages(images);
+      try {
+        const imageUrls = await service.getFilePreviews();
+        setImages(imageUrls);
+      } catch (error) {
+        console.error("Error loading images:", error);
+      }
     };
+
     loadImages();
   }, []);
 
   useEffect(() => {
     startAutoSlide();
-    return () => stopAutoSlide(); // Cleanup on unmount
-  }, [currentIndex]);
+    return () => stopAutoSlide();
+  }, [currentIndex, images.length]);
 
   const startAutoSlide = () => {
     stopAutoSlide();
